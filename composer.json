@@ -1,0 +1,29 @@
+{
+  "name": "jncinet/qihucms-user-follow",
+  "description": "qihucms user follow.",
+  "keywords": [
+    "qihucms",
+    "follow"
+  ],
+  "homepage": "https://www.qihucms.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "zhangye",
+      "email": "y@qilephp.com"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Qihucms\\UserFollow\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Qihucms\\UserFollow\\FollowServiceProvider"
+      ]
+    }
+  }
+}
