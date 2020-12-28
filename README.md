@@ -153,3 +153,14 @@ Qihucms\UserFollow\Events\Followed
 // 取消关注
 Qihucms\UserFollow\Events\UnFollowed
 ```
+
+## 数据库
+### 标签表：user_follows
+| Field             | Type      | Length    | AllowNull | Default   | Comment   |
+| :----             | :----     | :----     | :----     | :----     | :----     |
+| id                | bigint    |           |           |           |           |
+| user_id           | bigint    |           |           |           | 会员ID     |
+| to_user_id        | bigint    |           |           |           | 关注会员ID  |
+| status            | tinyint   |           |           | 1         | 关注状态    |
+| created_at        | timestamp |           | Y         | NULL      | 创建时间    |
+| updated_at        | timestamp |           | Y         | NULL      | 更新时间    |
