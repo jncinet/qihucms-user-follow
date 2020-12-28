@@ -3,6 +3,7 @@
 namespace Qihucms\UserFollow\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Qihucms\UserFollow\Events\Followed;
 use Qihucms\UserFollow\Events\UnFollowed;
 
@@ -24,17 +25,17 @@ class UserFollow extends Model
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo('App\Models\User');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function to_user()
+    public function to_user(): BelongsTo
     {
         return $this->belongsTo('App\Models\User');
     }

@@ -2,7 +2,7 @@
 
 namespace Qihucms\UserFollow\Controllers\Api;
 
-use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +11,7 @@ use Qihucms\UserFollow\Resources\UserFansCollection;
 use Qihucms\UserFollow\Resources\UserFollowCollection;
 use Qihucms\UserFollow\UserFollowRepository;
 
-class FollowsController extends ApiController
+class FollowsController extends Controller
 {
     private $follow;
 
@@ -27,10 +27,11 @@ class FollowsController extends ApiController
      * @param FollowIndexRequest $request
      * @return UserFollowCollection | UserFansCollection
      */
-    public function index(FollowIndexRequest $request)
+    public function userFollows(FollowIndexRequest $request)
     {
         $type = $request->get('type');
         $user_id = $request->get('user_id');
+        $user_id = intval($user_id);
         $status = $request->get('status');
 
         if ($type === 'follow') {
@@ -45,29 +46,36 @@ class FollowsController extends ApiController
     /**
      * 添加关注
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function follow($id)
     {
-        $to_user_id = $request->input('user_id');
-        $result = $this->follow->setFollow(Auth::id(), $to_user_id);
+        if (Auth::id() == $id) {
+            return $this->jsonResponse(
+                [__('user-follow::message.cannot_follow_yourself')],
+                '',
+                422
+            );
+        }
+
+        $result = $this->follow->setFollow(Auth::id(), $id);
         return $this->jsonResponse($result);
     }
 
     /**
      * 查询是否关注
      *
-     * @param $id
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function checkFollow($id)
     {
         $result = [
             'user_id' => Auth::id(),
             'to_user_id' => $id,
             'is_follow' => $this->follow->isFollow(Auth::id(), $id),
-            'is_fans' => $this->follow->isFollow($id, Auth::id()),
+            'is_fans' => $id == Auth::id() ? false : $this->follow->isFollow($id, Auth::id()),
         ];
         return $this->jsonResponse($result);
     }
@@ -76,25 +84,24 @@ class FollowsController extends ApiController
      * 批量关注
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function follows(Request $request)
     {
         $ids = $request->input('ids');
         if (is_array($ids)) {
             $ids = array_unique($ids);
             $result = [];
             foreach ($ids as $key => $id) {
-                if (User::where('id', $id)->exists()) {
-                    $result[$key] = $this->follow->setFollow(Auth::id(), $id);
+                if (Auth::id() != $id && User::where('id', $id)->exists()) {
+                    $result[$key] = $this->follow->setFollow(Auth::id(), intval($id));
                 } else {
                     $result[$key] = false;
                 }
             }
             return $this->jsonResponse($result);
         }
-        return $this->jsonResponse([], '参数不正确', 422);
+        return $this->jsonResponse([], '', 422);
     }
 
     /**
@@ -103,9 +110,14 @@ class FollowsController extends ApiController
      * @param  int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function unFollow($id)
     {
         $result = $this->follow->unsetFollow(Auth::id(), $id);
-        return $this->jsonResponse($result);
+
+        if ($result) {
+            return $this->jsonResponse(['user_id' => $id], '');
+        }
+
+        return $this->jsonResponse([__('user-follow::message.cancel_follow_fail')], '', 422);
     }
 }

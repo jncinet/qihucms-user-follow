@@ -34,20 +34,19 @@ class FollowsController extends AdminController
         $grid->filter(function ($filter) {
             // 去掉默认的id过滤器
             $filter->disableIdFilter();
-            $filter->equal('user_id', '关注会员ID');
-            $filter->equal('to_user_id', '被关注会员ID');
-            $filter->between('created_at', '关注时间')->datetime();
+            $filter->equal('user_id', __('user-follow::follow.user_id'));
+            $filter->equal('to_user_id', __('user-follow::follow.to_user_id'));
+            $filter->equal('to_user_id', __('user-follow::follow.status.label'))
+                ->select(__('user-follow::follow.status.value'));
+            $filter->between('created_at', __('user-follow::follow.created_at'))->datetime();
         });
 
         $grid->column('id', 'ID');
-        $grid->column('user.username', '关注会员账号');
-        $grid->column('user.nickname', '关注会员昵称');
-        $grid->column('to_user.username', '被关注会员账号');
-        $grid->column('to_user.nickname', '被关注会员昵称');
-        $grid->column('status', '状态')
-            ->using(['无效', '关注', '互相关注'])
-            ->dot(['info', 'success', 'danger'], 'success');
-        $grid->column('updated_at', '关注时间');
+        $grid->column('user.username', __('user-follow::follow.user_id'));
+        $grid->column('to_user.username', __('user-follow::follow.to_user_id'));
+        $grid->column('status', __('user-follow::follow.status.label'))
+            ->using(__('user-follow::follow.status.value'));
+        $grid->column('updated_at', __('user-follow::follow.created_at'));
 
         return $grid;
     }
@@ -63,6 +62,10 @@ class FollowsController extends AdminController
         $show = new Show(UserFollow::findOrFail($id));
 
         $show->field('id', 'ID');
+        $show->field('user_id', __('user-follow::follow.user_id'));
+        $show->field('to_user_id', __('user-follow::follow.to_user_id'));
+        $show->field('status', __('user-follow::follow.status.label'))
+            ->using(__('user-follow::follow.status.value'));
         $show->field('created_at', __('admin.created_at'));
         $show->field('updated_at', __('admin.updated_at'));
 
@@ -77,7 +80,8 @@ class FollowsController extends AdminController
     protected function form()
     {
         $form = new Form(new UserFollow());
-        $form->select('status', '状态')->options(['无效', '关注', '互相关注']);
+        $form->select('status', __('user-follow::follow.status.label'))
+            ->options(__('user-follow::follow.status.value'));
         return $form;
     }
 }

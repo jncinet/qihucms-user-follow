@@ -30,21 +30,8 @@ class FollowIndexRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'required' => ':attribute未设置',
-            'exists' => ':attribute不存在',
-            'in' => ':attribute只能为:values',
-        ];
-    }
-
     public function attributes()
     {
-        return [
-            'user_id' => '会员',
-            'type' => '读取类型',
-            'status' => '关注类型',
-        ];
+        return trans('');
     }
 }

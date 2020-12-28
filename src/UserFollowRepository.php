@@ -6,17 +6,10 @@ use Qihucms\UserFollow\Models\UserFollow;
 
 class UserFollowRepository
 {
-    private $follow;
-
-    public function __construct(UserFollow $follow)
-    {
-        $this->follow = $follow;
-    }
-
     // 判断是否关注
     public function isFollow(int $user_id, int $to_user_id)
     {
-        return $this->follow->where('user_id', $user_id)
+        return UserFollow::where('user_id', $user_id)
             ->where('to_user_id', $to_user_id)
             ->where('status', '>', 0)
             ->exists();
@@ -32,7 +25,7 @@ class UserFollowRepository
     public function setFollow(int $user_id, int $to_user_id)
     {
         $isFollow = $this->isFollow($user_id, $to_user_id);
-        $isFans = $this->isFollow($to_user_id, $user_id);
+        $isFans = $user_id != $to_user_id ? $this->isFollow($to_user_id, $user_id) : false;
 
         if ($isFollow) {
             return [
@@ -44,7 +37,7 @@ class UserFollowRepository
         }
 
         // 创建或更新关注关系
-        $this->follow->create(
+        UserFollow::create(
             [
                 'user_id' => $user_id,
                 'to_user_id' => $to_user_id,
@@ -74,8 +67,8 @@ class UserFollowRepository
      */
     public function unsetFollow(int $user_id, int $to_user_id)
     {
-        $result = $this->follow->where('user_id', $to_user_id)
-            ->where('to_user_id', $user_id)
+        $result = UserFollow::where('user_id', $user_id)
+            ->where('to_user_id', $to_user_id)
             ->delete();
 
         if ($result) {
@@ -94,8 +87,8 @@ class UserFollowRepository
      */
     public function setEachOther(int $user_id, int $to_user_id)
     {
-        return $this->follow->where('user_id', $to_user_id)
-            ->where('to_user_id', $user_id)
+        return UserFollow::where('user_id', $user_id)
+            ->where('to_user_id', $to_user_id)
             ->where('status', 1)
             ->update(['status' => 2]);
     }
@@ -109,7 +102,7 @@ class UserFollowRepository
      */
     public function unsetEachOther(int $user_id, int $to_user_id)
     {
-        return $this->follow->where('user_id', $user_id)
+        return UserFollow::where('user_id', $user_id)
             ->where('to_user_id', $to_user_id)
             ->where('status', 2)
             ->update(['status' => 1]);
@@ -128,7 +121,7 @@ class UserFollowRepository
         if (is_null($status)) {
             $status = 1;
         }
-        return $this->follow->where('user_id', $user_id)
+        return UserFollow::where('user_id', $user_id)
             ->where('status', '>=', $status)
             ->with('to_user')
             ->orderBy('id', 'desc')
@@ -148,7 +141,7 @@ class UserFollowRepository
         if (is_null($status)) {
             $status = 1;
         }
-        return $this->follow->where('to_user_id', $user_id)
+        return UserFollow::where('to_user_id', $user_id)
             ->where('status', '>=', $status)
             ->with('user')
             ->orderBy('id', 'desc')

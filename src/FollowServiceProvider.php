@@ -13,7 +13,9 @@ class FollowServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton('user-follow', function () {
+            return new UserFollowRepository();
+        });
     }
 
     /**
@@ -24,13 +26,10 @@ class FollowServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadRoutesFrom(__DIR__ . '/../routes.php');
-
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'user-follow');
         $this->publishes([
-            __DIR__ . '/../database/migrations/' => database_path('migrations'),
-        ], 'migrations');
-
-        if ($this->app->runningInConsole()) {
-            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        }
+            __DIR__ . '/../resources/lang' => resource_path('lang/vendor/user-follow'),
+        ]);
     }
 }
