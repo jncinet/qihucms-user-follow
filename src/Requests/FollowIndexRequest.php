@@ -32,6 +32,10 @@ class FollowIndexRequest extends FormRequest
 
     public function attributes()
     {
-        return trans('');
+        return [
+            'user_id' => trans('user-follow::follow.user_id'),
+            'type' => trans('user-follow::follow.type'),
+            'status' => trans('user-follow::follow.status.label'),
+        ];
     }
 }
