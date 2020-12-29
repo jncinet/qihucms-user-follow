@@ -8,10 +8,15 @@ $ composer require jncinet/qihucms-user-follow
 ```shell
 $ php artisan migrate
 ```
+
 ### 发布资源
 ```shell
 $ php artisan vendor:publish --provider="Qihucms\UserFollow\FollowServiceProvider"
 ```
+
+### 后台菜单
++ 关注管理：user/follows
+
 ### 可用方法
 ```php
 // 判断是否关注
